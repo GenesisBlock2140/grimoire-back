@@ -101,10 +101,14 @@ exports.createRating = (req, res, next) => {
         grade: req.body.rating
       })
 
-      const averageGrades = (newRatingList.reduce((sum, rating) => sum + rating.grade, 0) / newRatingList.length).toFixed(1)
+      const averageGrades = (newRatingList.reduce((sum, rating) => sum + rating.grade, 0) / newRatingList.length).toFixed(1);
 
       Book.updateOne({ _id: req.params.id }, { ratings: newRatingList, averageRating: averageGrades, _id: req.params.id })
-      .then(() => { res.status(201).json()})
+      .then(() => { res.status(201).json({
+        ...book._doc,
+        id: book._doc._id,
+        averageRating: Number(averageGrades),
+      })})
       .catch(error => { res.status(400).json( { error })});
     })
     .catch((error) => {
